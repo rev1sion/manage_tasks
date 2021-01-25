@@ -14,9 +14,9 @@ Demo: http://mabad21804.zzz.com.ua/
 Failed
 
 time is not residual
-[![N|Image](https://ibb.co/DRGCsyS)](https://ibb.co/DRGCsyS)
-https://ibb.co/zVyq2sv
- 
+![alt text](photo_1.jpg "time1")
+![alt text](photo_2.jpg "time2")
+
 ### Installation
 
 ### Development
