@@ -1,33 +1,51 @@
 <?php
 
 
-namespace taskBj;
+namespace testQ\Models;
 
 
 class Task
 {
-    private User $user;
-    private string $body;
-    private string $state;
-
-    public function __construct(User $_user, string $_body, $_state = 'New')
+    static function get(array $params)
     {
-        $this->user = $_user;
-        $this->body = $_body;
-        $this->state = $_state;
+        global $db, $logger;
+        $tasks = $db->select('tasks', ['[>]users' => ['user_id' => 'id']],
+            [
+                'tasks.id',
+                'tasks.body',
+                'tasks.state',
+                'userData' => [
+                    'users.username',
+                ]
+            ], $params);
+//        if ($db->error()[2])
+//        $logger->debug('', ['task' => $tasks, 'log' => $db->log()]);
+        return $tasks;
     }
-}
 
-class User
-{
-    private string $id;
-    private string $email;
-    private string $username;
-
-    public function __construct(array $data)
+    static function update(array $params, $where)
     {
-        $this->id = bin2hex(openssl_random_pseudo_bytes(16));
-        $this->email = $data['email'];
-        $this->username = $data['username'];
+        global $db, $logger;
+        $db->update('tasks', $params, $where);
+        if ($db->error()[2]) {
+            $logger->error('Update task failed', ['err' => $db->error()]);
+            return false;
+        }
+        return true;
+    }
+
+    static function create(array $params)
+    {
+        global $db, $logger;
+        $db->insert('tasks', $params);
+        if ($db->error()[2])
+            $logger->error('Create task failed', ['err' => $db->error()]);
+        return $db->id();
+    }
+
+    static function count(array $params = [])
+    {
+        global $db;
+        return $db->count('tasks', $params);
     }
 }

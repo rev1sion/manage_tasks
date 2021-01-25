@@ -1,42 +1,33 @@
 <?php
 
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
-use taskBj\TaskController;
+use testQ\Models\User;
 
-require_once 'vendor/autoload.php';
-require_once 'config.php';
-require_once 'models/models.php';
+require_once "main.php";
+
+ini_set('display_errors', true);
 
 
-// connect logger
-$log_dir = 'logs/' . date('Y') . "/" . date('m') . "/" . date('d');
-if (!file_exists($log_dir)) {
-    mkdir($log_dir, 0775, true);
+session_start();
+$logger->debug('Session', ['sss' => $_SESSION]);
+$logger->debug('init', ['post' => $_POST, 'get' => $_GET]);
+
+if (!empty($_SESSION['message'])) {
+    foreach ($_SESSION['message'] as $value) {
+        echo <<<MESSAGE
+<div>{$value}</div>   
+MESSAGE;
+    }
+    unset($_SESSION['message']);
 }
-$stream = new StreamHandler($log_dir . '/tasks.log', Logger::DEBUG);
-$logger = new Logger('index');
-$logger->pushHandler($stream);
-$logger->info('Initial log');
+echo $_SESSION['username'];
 
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-try {
-    $database = new DatabaseConnection($dbAuth);
-} catch (Exception $e) {
-    $logger->error("Connect to db failed, {$e->getMessage()}", ['trace' => $e->getTrace()]);
-    die();
+if (isset($_GET['auth'])) {
+    \testQ\AuthController::handleRequest($_GET['auth']);
+} else {
+    \testQ\TaskController::handleRequest($_GET['task']);
 }
-
-$task = [];
-$page = $_GET['page'] ?? 1;
-$username = $_SESSION['username'] ?? null;
-
-$controller = new TaskController($database);
-
-
-$controller->get($username, $page);
-
-
 
 
 
