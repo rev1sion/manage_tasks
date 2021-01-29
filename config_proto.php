@@ -1,11 +1,5 @@
 <?php
 
-//Username: w53LRl8Wf1
-//Database name: w53LRl8Wf1
-//Password: GAoUqvlGEi
-//Server: remotemysql.com
-//Port: 3306
-
 $DEBUG = true;
 
 $dbAuth = [
@@ -15,6 +9,9 @@ $dbAuth = [
 //    'port' => '123',
     'username' => '****',
     'password' => '****',
-    'logging' => false
+    'logging' => false,
+
+	'charset' => 'utf8mb4',
+	'collation' => 'utf8mb4_general_ci'
 ];
 

@@ -28,9 +28,9 @@ $title = 'Edit task' ?>
                                         class="uk-select"
                                         name="username">
                                     <?php foreach ($users as $user) { ?>
-                                        <option <?php if ($user['username'] == $task['userData']['username']) echo 'selected' ?>
-                                                value="<?= $user['username'] ?>">
-                                            <?= $user['username'] ?>
+                                        <option <?php if ($user == $task['userData']['username']) echo 'selected' ?>
+                                                value="<?= $user ?>">
+                                            <?= $user ?>
                                         </option>
                                     <?php } ?>
                                 </select>
@@ -45,7 +45,7 @@ $title = 'Edit task' ?>
                                         Pending
                                     </option>
                                     <option value="Done">
-                                        done
+                                        Done
                                     </option>
                                 </select>
 

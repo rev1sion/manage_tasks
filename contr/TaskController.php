@@ -12,21 +12,25 @@ class TaskController implements iRequestController
     static function handleRequest($action)
     {
         global $logger;
-        $logger->debug('task controller', ['post' => $_POST]);
+        $logger->debug('task controller', ['post' => $_POST, 'get' => $_GET]);
+        $def_order_by = ['created_at', 'DESC'];
 
         switch ($action) {
             case 'create':
-                //... validate
-//                $user = new User();
-//                $user->username = $_POST['username'] ?? $_SESSION['username'];
-//                $user->email = $_POST['email'];
-//                $user->ip = '123';
+                $username = $_POST['username'] ?? $_SESSION['username'];
+                $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
 
-                $user_id = @User::get(['username' => $_POST['username'] ?? $_SESSION['username']])[0]['id'];
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $logger->error('Email validation failed', ['em' => $email]);
+                    $_SESSION['message'][] = 'Email is not valid';
+                    header('Location: /');
+                }
+
+                $user_id = @User::get(['username' => $username], 'id')[0];
                 if (empty($user_id)) {
                     $user = [
-                        'username' => $_POST['username'] ?? $_SESSION['username'],
-                        'email' => filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL),
+                        'username' => $username,
+                        'email' => $email,
                         'ip_address' => '123'
                     ];
                     $user_id = User::create((array)$user);
@@ -55,16 +59,16 @@ class TaskController implements iRequestController
                 header('Location: /');
                 break;
             case 'update':
-                if (@$_SESSION['username']) {
-                    $user = @User::get(['username' => $_SESSION['username']])[0];
-                    if ($user['admin']) {
+                if (isset($_SESSION['username'])) {
+                    $is_admin = @User::get(['username' => $_SESSION['username']], 'admin')[0];
+                    if ($is_admin) {
                         $params = [
                             'body' => $_POST['body'],
                             'state' => $_POST['state'],
                         ];
 
-                        if (@$_POST['username']) {
-                            $_user = @User::get(['username' => $_POST['username']])[0];
+                        if (isset($_POST['username'])) {
+                            $_user = @User::get(['username' => $_POST['username']], ['id', 'username'])[0];
                             $params['user_id'] = $_user['id'];
                         }
 
@@ -81,19 +85,22 @@ class TaskController implements iRequestController
                     header("Location: index.php?auth=login");
                 }
                 break;
-            case 'edit':
-                if (!empty($_SESSION['username'])) {
-                    // ... check admin
-
-                    $is_admin = true;
-                    $task = @Task::get(['tasks.id' => filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT)])[0];
-                    $users = @User::get(['LIMIT' => [0, 5]]);
-                    include_once 'templates/task_edit.html.php';
+            case 'sort':
+                $sort = filter_input(INPUT_GET, 'by', FILTER_SANITIZE_STRING);
+                list($sort, $value) = explode(':', $sort);
+                if (stripos($sort, 'name') !== false) {
+                    if ($value === 'DESC') {
+                        $def_order_by = ['users.username', 'ASC'];
+                    } elseif ($value === 'ASC') {
+                        $def_order_by = ['users.username', 'DESC'];
+                    }
+                } elseif (stripos($sort, 'date') !== false){
+                    if ($value === 'DESC') {
+                        $def_order_by = ['created_at', 'ASC'];
+                    }
                 }
-                break;
             default:
-
-                if (@$_SESSION['username'])
+                if (isset($_SESSION['username']))
                     $is_admin = true;
                 else
                     $is_admin = false;
@@ -102,7 +109,7 @@ class TaskController implements iRequestController
                 $limit = 3;
                 $offset = ($page - 1) * $limit;
                 $tasks = Task::get([
-                    'ORDER' => ['created_at' => 'DESC'],
+                    'ORDER' => [$def_order_by[0] => $def_order_by[1]],
                     'LIMIT' => [$offset, $limit]
                 ]);
 

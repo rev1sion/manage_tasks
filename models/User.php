@@ -6,10 +6,15 @@ namespace testQ\Models;
 class User
 {
 
-    static function get(array $params)
+    /**
+     * @param array $params
+     * @param string|array $fields
+     * @return array|bool
+     */
+    static function get(array $params, $fields = '*')
     {
         global $db;
-        return $db->select('users', '*', $params);
+        return $db->select('users', $fields, $params);
     }
 
     static function create(array $params)

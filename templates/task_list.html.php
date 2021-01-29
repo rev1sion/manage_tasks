@@ -150,6 +150,11 @@ $title = 'Список задач' ?>
                     </div>
                 </div>
             </div>
+            <div class="uk-flex">
+                <p>Sort by: </p>
+                <a href="?task=sort&by=name:<?= @$def_order_by[1] ?>" id="sortByName" class="uk-margin-left"> Name </a>
+                <a href="?task=sort&by=date:<?= @$def_order_by[1] ?>" id="sortByDate" class="uk-margin-left"> Date </a>
+            </div>
         </div>
     </section>
 
@@ -161,7 +166,8 @@ $title = 'Список задач' ?>
                     <span class="task--body uk-width-4-1">
                         <?= @$task['body'] ?>
                     </span>
-                    <span class="uk-width-1-6 uk-text-center" style="color: orange"><?= @$task['userData']['username'] ?></span>
+                    <span class="uk-width-1-6 uk-text-center"
+                          style="color: orange"><?= @$task['userData']['username'] ?></span>
                     <span class="uk-width-1-6 uk-text-center
                     <?php if ($task['state'] == 'New') {
                         echo "uk-text-primary\">{$task['state']}</span>"; ?>
@@ -180,30 +186,6 @@ $title = 'Список задач' ?>
                 <? } ?>
             </li>
         </ul>
-        <!--    <ul class="uk-list uk-list-striped">-->
-        <!--        <li>-->
-        <!--            <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">-->
-        <!--                --><?php //if ($is_admin) { ?>
-        <!--                    <label><input class="uk-checkbox" type="checkbox" checked>-->
-        <!--                        <span>--><? //= $task['body'] ?><!--</span>-->
-        <!--                        --><?php //switch ($task['state']) {
-//                            case 'New':
-//                                echo "<span class=\"uk-label uk-label-success\">New</span>";
-//                                break;
-//                            case 'Complete':
-//                                echo "<span class=\"uk-label uk-label-success\">Complete</span>";
-//                                break;
-//                            case 'Pending':
-//                                echo "<span class=\"uk-label uk-label-success\">In progress</span>";
-//                                break;
-//                        } ?>
-        <!--                    </label>-->
-        <!---->
-        <!--                --><?php //} else { ?>
-        <!--                --><?php //} ?>
-        <!--            </div>-->
-        <!--        </li>-->
-        <!--    </ul>-->
     <?php } ?>
     <ul class="uk-pagination">
         <?php if (!empty($prev_page)) { ?>

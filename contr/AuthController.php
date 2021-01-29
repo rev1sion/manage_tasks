@@ -12,28 +12,26 @@ class AuthController implements iRequestController
     static function handleRequest($action)
     {
         global $logger;
-        if ($action == 'login' and @$_POST['username']) {
+        if ($action === 'login' and $username = $_POST['username']) {
             $logger->debug('Login', ['cred' => $_POST]);
 
-//            $pass = "password";
-//            $hash = password_hash($pass, PASSWORD_BCRYPT, $options);
-
-            $user = @User::get(['username' => $_POST['username']])[0];
-            if ($user === false or empty($user)) {
+            // Used PDO driver. if u want we can use $username = mysql_real_escape_string($username);
+            $user_pass = @User::get(['username' => $username], 'pass')[0];
+            if ($user_pass === false or empty($user_pass)) {
                 $logger->error('Auth user failed');
-                $_SESSION['message'][] = 'Ошибка авторизации1';
+                $_SESSION['message'][] = 'Ошибка авторизации';
                 header('Location: /');
                 exit();
             }
-            $hash = (string)$user['pass'];
+            $hash = (string)$user_pass;
             if (password_verify($_POST['pass'], $hash)) {
                 $logger->debug('Auth user', [$hash]);
                 $_SESSION['username'] = 'admin';
-                $_SESSION['message'][] = 'Success';
+                $_SESSION['message'][] = "Hello $username";
                 header('Location: /');
             } else {
-                $logger->error('Auth user failed', [$user]);
-                $_SESSION['message'][] = 'Ошибка авторизации2';
+                $logger->error('Auth user failed: invalid password', [$user_pass]);
+                $_SESSION['message'][] = 'Ошибка авторизации';
                 header('Location: /');
             }
         } elseif ($action == 'logout') {
@@ -45,10 +43,5 @@ class AuthController implements iRequestController
             header('Location: /');
             exit;
         }
-    }
-
-    function validPass($pass)
-    {
-
     }
 }
