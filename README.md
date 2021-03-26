@@ -2,7 +2,8 @@
 
 
 Create simple mvc app without frameworks.
-Demo: http://mabad21804.zzz.com.ua/
+Demo: http://pamiren.s1host.ml/
+<s>http://mabad21804.zzz.com.ua/</s>
 
 
   - Task have: username, email, body;
